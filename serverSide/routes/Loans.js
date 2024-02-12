@@ -6,14 +6,30 @@ const {
   getLoansByUser,
   getLoansOver,
   addLoan,
-  updateLoan,
-} = require("../database/loans");
+  updateLoanReturn} 
+  = require("../database/loans");
 const { login } = require("../database/login");
 
 const loansRoutes = express.Router();
 
-loansRoutes.get("/bookId/:bookId", async (req, res) => {
+loansRoutes.get("/", async (req, res) => {
   console.log(11);
+
+  try {
+    
+    const data = await getAllLoans();
+    if (!data) {
+      console.log("Data is null, returning 404");
+      res.status(404).send("Letter is not found");
+      return;
+    }
+    res.json(data);
+  } catch (err) {
+    console.error("Error in postsRoutes:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+loansRoutes.get("/loansByBook/:bookId", async (req, res) => {
 
   try {
     const bookId=req.params.bookId;
@@ -29,7 +45,7 @@ loansRoutes.get("/bookId/:bookId", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-loansRoutes.get("/userByEmail/:email", async (req, res) => {
+loansRoutes.post("/loansByUser", async (req, res) => {
   console.log(11);
 const email = req.body.email;
   try {
@@ -46,7 +62,7 @@ const email = req.body.email;
     res.status(500).send("Internal Server Error");
   }
 });
-loansRoutes.get("/returnDateHasPassed", async (req, res) => {
+loansRoutes.get("/loansOver", async (req, res) => {
   console.log(11);
 
   try {
@@ -70,10 +86,9 @@ loansRoutes.post("/", async (req, res) => {
   try {
     const email = req.body.email;
     const book_id = req.body.book_id;
-    const loan_date = req.body.loan_date;
-    const return_date = req.body.request_date;
+    const return_date = req.body.return_date;
 
-    const data = await addLoan(email, book_id, loan_date, return_date);
+    const data = await addLoan(email, book_id, return_date);
     if (data) {
       res.status(201).json(data);
     } else {
@@ -89,9 +104,9 @@ loansRoutes.put("/", async (req, res) => {
 
   try {
     const email = req.body.email;
-    const id = req.body.id;
+    const idLoans = req.body.idLoans;
 
-    const data = await updateLoan (id, email);
+    const data = await updateLoanReturn (idLoans, email);
     if (data) {
       res.status(201).json(data);
     } else {

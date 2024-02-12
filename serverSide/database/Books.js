@@ -104,6 +104,42 @@ async function searchByStartingLetterInCategory(letter, category) {
   }
 }
 
+
+async function deleteBookById(id) {
+    try {
+      const [result] = await pool.query("DELETE FROM books WHERE id = ?", [id]);
+      if (result.affectedRows === 0) {
+        console.log("No book found with the given ID.");
+        return null;
+      }
+      console.log(`Deleted book with ID ${id}.`);
+      return result;
+    } catch (error) {
+      console.error("Error deleting book:", error);
+      throw error;
+    }
+  }
+  
+
+
+  async function addBook(title, author, genre, release_year, page, audience, status) {
+    try {
+      const [result] = await pool.query(
+        "INSERT INTO books (title, author, genre, release_year, page, audience, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [title, author, genre, release_year, page, audience, status]
+      );
+      console.log(`Added new book with ID ${result.insertId}.`);
+      return result.insertId;
+    } catch (error) {
+      console.error("Error adding book:", error);
+      throw error;
+    }
+  }
+  
+
+
+
+
 //   getABooksByPage('c2')
 //   getABooksByAudience('teen')
 //   getABooksByGenre('Fiction')
@@ -118,4 +154,7 @@ module.exports = {
   getABooksByPage,
   getABooksByAudience,
   searchByStartingLetterInCategory,
+  deleteBookById,
+  addBook
+  
 };

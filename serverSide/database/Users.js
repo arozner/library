@@ -1,28 +1,30 @@
 const mysql = require("mysql2/promise");
 const { pool } = require("./Pool.js");
 
-async function getUser(username, password) {
+async function getUser(email, password) {
   try {
     const [data] = await pool.query(
-      `SELECT * FROM customers WHERE name = ? AND password =? `,
-      [username, password]
+      "SELECT * FROM customers WHERE email = ? AND password = ?",
+      [email, password]
     );
     if (data.length > 0) {
+      console.log("User found:");
       console.log(data);
       return data;
     } else {
-      console.log(null);
+      console.log("User not found.");
       return null;
     }
   } catch (error) {
-    console.error("Error in todosGetByUserId:", error);
+    console.error("Error in getUser:", error);
     throw error;
   }
 }
-async function getUsersByLetter(letter) {
+
+async function getUsersByLetter(letterByLastName) {
   try {
-    const query = `SELECT * FROM customers WHERE name LIKE CONCAT(?, '%')`;
-    const params = [letter];
+    const query = `SELECT * FROM customers WHERE last_name LIKE CONCAT(?, '%')`;
+    const params = [letterByLastName];
     const [data] = await pool.query(query, params);
     if (data.length > 0) {
       console.log(data);
@@ -37,7 +39,7 @@ async function getUsersByLetter(letter) {
   }
 }
 
-async function addUser(name, phone, idNumber, password, email) {
+async function addUser(first_name, last_name, phone, idNumber, password, email) {
   console.log(33);
   try {
     // Check if the user already exists based on email and idNumber
@@ -54,29 +56,68 @@ async function addUser(name, phone, idNumber, password, email) {
 
     // User does not exist, so insert a new user
     const [result] = await pool.query(
-      "INSERT INTO customers ( name, email, phone, Israeli_ID, password) VALUES (?, ?, ?, ?, ?)",
-      [name, email, phone, idNumber, password]
+      "INSERT INTO customers (email, phone, Israeli_ID, password, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)",
+      [email, phone, idNumber, password, first_name, last_name]
     );
-
+    
+console.log(99);
     // Check if the user was successfully added
     if (result.affectedRows === 1) {
       console.log("User added successfully");
-      return result.insertId; // Return the ID of the newly inserted user
+      const [data] = await pool.query(
+        "SELECT * FROM customers WHERE id = ? ",
+        [result.insertId ]
+      );
+      console.log(data);
+      return data; // Return the ID of the newly inserted user
     } else {
       console.log("Failed to add user");
-      return null; // Indicate that the user was not added
+      
     }
   } catch (error) {
-    console.error("Error in addUser:", error);
+
+
     throw error;
   }
 }
 
-// addUser("ar", "05236482679", "311201826", "748219", "rozner@GamesOutlined.com")
+async function getUserById(id) {
+  try {
+    const [data] = await pool.query(
+      "SELECT * FROM customers WHERE id = ? ",
+      [id]
+    );
+    if (data.length > 0) {
+      console.log("User found:");
+      console.log(data);
+      return data;
+    } else {
+      console.log("User not found.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error in getUser:", error);
+    throw error;
+  }
+}
+// addUser(first_name, last_name, phone, idNumber, password, email)
+// addUser("arr","sdss", "05236482679", "388", "123123", "rnr@Galined.com")
+
+
+// async function testAddUser() {
+//   try {
+//     const result = await addUser("arr", "sdss", "05236482679", "9999", "123123", "rooozner@Gamutlined.com");
+//     console.log("Result:", result);
+//   } catch (error) {
+//     console.error("Error:", error);
+//   }
+// }
+
+// testAddUser();
 
 // Call the function
 // ss();
 // addUser("ar", "0523648679", "311201888", "748219", "rozner@GamesOutlined.com")
 
 // getUsersByLetter('1')
-module.exports = { getUser, addUser, getUsersByLetter };
+module.exports = { getUser, addUser, getUsersByLetter, getUserById };

@@ -1,9 +1,8 @@
-
 const express = require("express");
 const { userRoutes } = require("./routes/Users");
 const { adminRoutes } = require("./routes/Admin");
 const { loansRoutes } = require("./routes/loans");
-// const { booksRoutes } = require("./routes/books");
+const { booksRoutes } = require("./routes/books");
 
 const cors = require("cors");
 
@@ -16,12 +15,12 @@ app.use(express.json());
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/loans", loansRoutes);
-// app.use("/api/books", booksRoutes);
+app.use("/api/books", booksRoutes);
 
 // Error handling middleware (example)
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Something went wrong!');
+  res.status(500).send("Something went wrong!");
 });
 
 const port = process.env.PORT || 9999;
