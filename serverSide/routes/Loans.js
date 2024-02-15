@@ -45,12 +45,12 @@ loansRoutes.get("/loansByBook/:bookId", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-loansRoutes.post("/loansByUser", async (req, res) => {
+loansRoutes.get("/loansByUser/:id", async (req, res) => {
   console.log(11);
-const email = req.body.email;
+const id = req.params.id;
   try {
     
-    const data = await getLoansByUser(email);
+    const data = await getLoansByUser(id);
     if (!data) {
       console.log("Data is null, returning 404");
       res.status(404).send("Letter is not found");

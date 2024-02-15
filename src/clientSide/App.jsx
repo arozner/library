@@ -3,8 +3,8 @@ import Login from "./Login/Login";
 import NewLogin from "./Login/NewLogin";
 import AdminLogin from "./Login/AdminLogin";
 import Home from "./Home";
-
 import UserHome from "./subscription/UserHome";
+
 import { Route, Routes, useNavigate, Link } from 'react-router-dom'
 
 // import reactLogo from "./assets/react.svg";
@@ -28,7 +28,7 @@ function App() {
 <Route path='/user/:id' element={<UserHome />} />
 <Route path='/newLogin/' element={<NewLogin />} />
 <Route path='/adminLogin/' element={<AdminLogin />} />
-<Route path='/admin/:id' element={<Home />} />
+<Route path='/admin/:name' element={<Home />} />
 
 </Routes>      
       

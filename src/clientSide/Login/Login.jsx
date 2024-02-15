@@ -13,12 +13,11 @@
 //   const handleLogin = (type) => {
 //     setLoginType(type);
 //   };
-  
+
 // const navigate = useNavigate()
 //   return (
 //     <div className="login" >
-   
-    
+
 //       {loginType === '' && (
 //         <>
 //    <Stack direction="row" spacing={2}>
@@ -43,20 +42,16 @@
 //   );
 // }
 
-
-
-
-
 import { useState, useEffect } from "react";
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
+import { Routes, Route, useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
 import NewLogin from "./NewLogin";
 import AdminLogin from "./AdminLogin";
 import UserLogin from "./UserLogin.JSX";
 
 export default function Login() {
-  const [loginType, setLoginType] = useState('');
+  const [loginType, setLoginType] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = (type) => {
@@ -64,38 +59,39 @@ export default function Login() {
   };
 
   useEffect(() => {
-    if (loginType === 'register') {
-      navigate('/NewLogin.jsx');
-    } else if (loginType === 'admin') {
-      navigate('/AdminLogin');
-    } else if (loginType === 'user') {
-      navigate('/UserLogin');
+    if (loginType === "register") {
+      navigate("/newLogin");
+    } else if (loginType === "admin") {
+      navigate("/adminLogin");
+    } else if (loginType === "user") {
+      navigate("/userLogin");
     }
   }, [loginType, navigate]);
 
   return (
     <div className="login">
-      {loginType === '' && (
+      {loginType === "" && (
         <Stack direction="row" spacing={2}>
-          <Button variant="contained" color="success" onClick={() => handleLogin('user')}>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => handleLogin("user")}
+          >
             Users
           </Button>
-          <Button variant="contained" onClick={() => handleLogin('admin')}>
+          <Button variant="contained" onClick={() => handleLogin("admin")}>
             Admin
           </Button>
-          <Button variant="outlined" color="secondary" onClick={() => handleLogin('register')}>
-            Not registered?<br /> Sign up now
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => handleLogin("register")}
+          >
+            Not registered?
+            <br /> Sign up now
           </Button>
         </Stack>
       )}
-     <Routes>
-  <Route >
-    {/* Your other routes here */}
-    <Route path="/NewLogin.jsx" element={<NewLogin />} />
-    <Route path="/AdminLogin" element={<AdminLogin />} />
-    <Route path="/UserLogin" element={<UserLogin />} />
-  </Route>
-</Routes>
     </div>
   );
 }

@@ -29,17 +29,19 @@ async function getAllLoans() {
   }
 }
 
-async function getLoansByUser(email) {
+async function getLoansByUser(id) {
   try {
     const [customerData] = await pool.query(
-      "SELECT * FROM customers WHERE email = ?",
-      [email]
+      "SELECT * FROM customers WHERE id = ?",
+      [id]
     );
 
     if (customerData.length === 0) {
       console.log("Customer not found.");
       return null;
     }
+
+    const email = customerData[0].email; // Assuming the column name is 'email'
 
     const [data] = await pool.query(
       "SELECT * FROM loans WHERE borrower_email = ?",
@@ -50,15 +52,25 @@ async function getLoansByUser(email) {
       console.log("No loans found for this user.");
       return null;
     }
+    const [data2] = await pool.query(
+      "SELECT books.title, books.author, customers.email, loans.loan_date, loans.return_date, loans.returned FROM loans JOIN books ON loans.book_id = books.id JOIN customers ON loans.borrower_email = customers.email WHERE customers.id = ?",
+      [id]
+    );
 
-    console.log(data);
-    return data;
+    if (data2.length === 0) {
+      console.log("No loans found for this user.");
+      return null;
+    }
+
+    console.log(data2);
+    return data2;
   } catch (error) {
     console.error("Error fetching loans by user:", error);
     throw error;
   }
 }
 
+// getLoansByUser(66)
 
 async function getLoansByBook(book_id) {
   try {

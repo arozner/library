@@ -692,10 +692,15 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import { Route, Routes, useNavigate } from 'react-router-dom'
+// import { Link } from 'react-router-dom';
+
 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 export default function NewLogin() {
+  const nav = useNavigate();
+
 
   function isValidName(name) {
     return /^[a-zA-Z]{2,}$/.test(name);
@@ -766,6 +771,8 @@ export default function NewLogin() {
             email: '',
           });
           setRegistrationError('');
+          nav(`/userLogin`);
+
         }
       } catch (error) {
         setRegistrationError('Registration failed. Please try again.');
@@ -817,7 +824,7 @@ export default function NewLogin() {
 
   return (
     <>
-      {!registrationWasSuccessful && !userExist ? (
+      {/* {!registrationWasSuccessful && !userExist ? ( */}
         <ThemeProvider theme={defaultTheme}>
           <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -937,7 +944,7 @@ export default function NewLogin() {
                     />
                   </Grid>
                 </Grid>
-                <Button
+                {/* <Button
                   type="submit"
                   fullWidth
                   variant="contained"
@@ -945,9 +952,9 @@ export default function NewLogin() {
                   disabled={!isFormValid}
                 >
                   Sign Up
-                </Button>
+                </Button> */}
 
-{/* <Button
+<Button
         type="submit"
         fullWidth
         variant="contained"
@@ -955,7 +962,7 @@ export default function NewLogin() {
         disabled={!isFormValid}
       >
         Sign Up
-      </Button> */}
+      </Button>
       {registrationError && (
         <Typography color="error">{registrationError}</Typography>
       )}
@@ -971,9 +978,7 @@ export default function NewLogin() {
             </Box>
           </Container>
         </ThemeProvider>
-      ) : (
-        <UserLogin />
-      )}
+    
     </>
   );
 }

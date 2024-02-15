@@ -1,6 +1,7 @@
 // import React from 'react'
 import Home from '../Home'
 
+import { Route, Routes, useNavigate, Link } from 'react-router-dom'
 
 import React, { useEffect, useState } from 'react';
 import Button from "@mui/material/Button";
@@ -11,17 +12,18 @@ import Container from "@mui/material/Container";
 import axios from 'axios';
 
 export default function AdminLogin() {
-  const [adminname, setAdminname] = useState("");
+  const nav = useNavigate();
+
+  const [adminName, setAdminName] = useState("");
   const [password, setPassword] = useState("");
-  // const [newUser, setNewUser] = useState("");
   const [checkingNameAndPassword, setCheckingNameAndPassword] = useState(false);
   const [adminExists, setAdminExists] = useState(false);
 
   const handleInput = (event) => {
     const { name, value } = event.target;
-    if (name === "adminname") {
-      setAdminname(value);
-      console.log(adminname);
+    if (name === "adminName") {
+      setAdminName(value);
+      console.log(adminName);
     } else if (name === "password") {
       console.log(password);
       setPassword(value);
@@ -29,12 +31,12 @@ export default function AdminLogin() {
   };
 
   useEffect(() => {
-    if (password.length >= 6 && adminname.length > 0) {
+    if (password.length >= 6 && adminName.length > 0) {
       setCheckingNameAndPassword(true);
     } else {
       setCheckingNameAndPassword(false);
     }
-  }, [adminname, password]);
+  }, [adminName, password]);
 
  
   const checkUserExists = async (event) => {
@@ -45,21 +47,36 @@ export default function AdminLogin() {
 
     try {
       const response = await axios.post('http://localhost:9999/api/admin', {
-        adminname: adminname,
+        adminName: adminName,
         password: password,
       });
-  
-      setAdminExists(response.data);
-      console.log(response.data);
-      console.log(adminExists);
+
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        const adminName = response.data[0].username;
+        console.log(adminName);
+        setAdminExists(response.data);
+        nav(`/admin/${adminName}`);
+        console.log(response.data);
+        console.log(adminExists);
+
+      } else {
+        console.error('User not found');
+      }
     } catch (error) {
       console.error('Error:', error);
     }
   };
   
+   
+  
   useEffect(() => {
     console.log(adminExists);
   }, [adminExists]);
+  // useEffect(() => {
+  //   const adminName = adminExists[0].adminName;
+  //       nav(`/admin/${name1}`);
+
+  // }, [adminExists]);
   
   // const newUsers= ()=>{
 
@@ -99,10 +116,10 @@ export default function AdminLogin() {
         margin="normal"
         required
         fullWidth
-        id="adminname"
-        label="adminname"
-        name="adminname"
-        autoComplete="adminname"
+        id="adminName"
+        label="adminName"
+        name="adminName"
+        autoComplete="adminName"
         autoFocus
       />
       <TextField
@@ -145,8 +162,8 @@ export default function AdminLogin() {
 
 
 
-    {adminExists ? < Home 
- /> : null}
+    {/* {adminExists ? < Home 
+ /> : null} */}
 
 
     </>

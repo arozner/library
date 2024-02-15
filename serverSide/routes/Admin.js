@@ -32,10 +32,15 @@ adminRoutes.post("/", async (req, res) => {
   console.log(11);
 
   try {
-    const adminname = req.body.adminname;
+    const adminName = req.body.adminName;
     const password = req.body.password;
     console.log(10);
-    const data = await getAdmin(adminname, password);
+    const data = await getAdmin(adminName, password);
+    if (!data) {
+      console.log("Data is null, returning 404");
+      res.status(404).send("admin is not found");
+      return;
+    }
     res.json(data);
   } catch (err) {
     console.error("Error in postsRoutes:", err);
