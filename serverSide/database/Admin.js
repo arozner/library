@@ -1,13 +1,13 @@
 const mysql = require("mysql2/promise");
 const { pool } = require("./Pool.js");
 
-async function getAdmin(adminName, password) {
+async function getAdmin(email, password) {
   console.log(22);
-  console.log("adminName :", adminName, "password :", password); 
+  console.log("adminName :", email, "password :", password); 
   try {
     const [data] = await pool.query(
-      `SELECT * FROM admins WHERE username = ? AND password =? `,
-      [adminName, password]
+      `SELECT * FROM admins WHERE email = ? AND password =? `,
+      [email, password]
     );
     if (data.length > 0) {
       console.log(data);

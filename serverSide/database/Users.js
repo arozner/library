@@ -1,6 +1,18 @@
 const mysql = require("mysql2/promise");
 const { pool } = require("./Pool.js");
 
+async function getAllUsers() {
+  try {
+    const data = await pool.query("SELECT * FROM customers");
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    throw error;
+  }
+}
+
+
 async function getUser(email, password) {
   try {
     const [data] = await pool.query(
@@ -100,6 +112,28 @@ async function getUserById(id) {
     throw error;
   }
 }
+
+async function deleteUser(id,email) {
+  try {
+    const [userDetails] = await pool.query(
+      'SELECT * FROM customers WHERE id = ? AND email = ?',
+      [id, email]
+    );
+if(!userDetails){return null}
+
+    const [result] = await pool.query("DELETE FROM customers WHERE id = ? AND email= ?", [id, email]);
+    if (result.affectedRows === 0) {
+      console.log("No user found with the given ID or email.");
+      return null;
+    }
+    console.log(`Deleted user with ID ${id}.`);
+    return userDetails;
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw error;
+  }
+}
+
 // addUser(first_name, last_name, phone, idNumber, password, email)
 // addUser("arr","sdss", "05236482679", "388", "123123", "rnr@Galined.com")
 
@@ -120,4 +154,4 @@ async function getUserById(id) {
 // addUser("ar", "0523648679", "311201888", "748219", "rozner@GamesOutlined.com")
 
 // getUsersByLetter('1')
-module.exports = { getUser, addUser, getUsersByLetter, getUserById };
+module.exports = { getUser, addUser, getUsersByLetter, getUserById ,deleteUser,getAllUsers };

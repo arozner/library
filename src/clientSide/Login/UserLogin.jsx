@@ -161,10 +161,10 @@
 
 
 
-
+import DataContext from "../context/DataContext";
 import NewLogin from "./NewLogin";
 import UserHome from '../subscription/UserHome';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Route, Routes, useNavigate, Link } from 'react-router-dom'
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -172,6 +172,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import axios from 'axios';
+import Cookies from "js-cookie";
 
 export default function UserLogin() {
   const [email, setEmail] = useState("");
@@ -179,6 +180,7 @@ export default function UserLogin() {
   const [newUser, setNewUser] = useState("");
   const [checkingEmailAndPassword, setCheckingEmailAndPassword] = useState(false);
   const [userExists, setUserExists] = useState(false);
+  const {userToken, setUserToken} = useContext(DataContext); 
 const nav = useNavigate();
   const handleInput = (event) => {
     const { name, value } = event.target;
@@ -204,20 +206,31 @@ const nav = useNavigate();
     console.log('Checking user...');
     console.log(email, password);
   
-    try {
-      const response = await axios.post('http://localhost:9999/api/user/login', {
-        email: email,
-        password: password,
-      });
-      if (Array.isArray(response.data) && response.data.length > 0) {
-        const userId = response.data[0].id;
-        setUserExists(userId);
-        nav(`/user/${userId}`);
-        console.log(response.data);
-        console.log(userId);
-      } else {
-        console.error('User not found');
-      }
+    
+      try {
+        const response = await axios.post('http://localhost:9999/api/user/login', {
+          email: email,
+          password: password,
+        });
+      
+        if (response.data.data && response.data.token) {
+          const user = response.data.data[0];
+          const token = response.data.token;
+          const userId = user.id;
+      
+          Cookies.set("user", (token))
+          setUserExists(userId);
+          console.log("user:", Cookies.get("user"));
+          // console.log(1213);y
+          setUserToken(Cookies.get("user"))
+          nav(`/user/home/${userId}`);
+      
+          console.log("User:", user);
+          console.log("Token:", token);
+          console.log("User ID:", userId);
+        } else {
+          console.error('User not found');
+        }
     } catch (error) {
       console.error('Error:', error);
     }

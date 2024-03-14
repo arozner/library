@@ -107,13 +107,19 @@ async function searchByStartingLetterInCategory(letter, category) {
 
 async function deleteBookById(id) {
     try {
+      const [bookDetails] = await pool.query(
+        'SELECT * FROM books WHERE id = ?',
+        [id]
+      );
+// if(!bookDetails){return null}
+
       const [result] = await pool.query("DELETE FROM books WHERE id = ?", [id]);
       if (result.affectedRows === 0) {
         console.log("No book found with the given ID.");
         return null;
       }
       console.log(`Deleted book with ID ${id}.`);
-      return result;
+      return bookDetails;
     } catch (error) {
       console.error("Error deleting book:", error);
       throw error;
@@ -122,11 +128,11 @@ async function deleteBookById(id) {
   
 
 
-  async function addBook(title, author, genre, release_year, page, audience, status) {
+  async function addBook(title, author, genre, release_year, page, audience, shelf) {
     try {
       const [result] = await pool.query(
-        "INSERT INTO books (title, author, genre, release_year, page, audience, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        [title, author, genre, release_year, page, audience, status]
+        "INSERT INTO books (title, author, genre, audience, status, page, shelf ,release_year) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        [title, author, genre, audience,"Available", page, shelf ,release_year ]
       );
       console.log(`Added new book with ID ${result.insertId}.`);
       return result.insertId;

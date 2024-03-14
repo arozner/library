@@ -1,10 +1,38 @@
 const express = require("express");
 
-const { getUser, addUser, getUsersByLetter, getUserById } = require("../database/Users");
-
+const {
+  getUser,
+  addUser,
+  getUsersByLetter,
+  getUserById,
+  deleteUser,
+  getAllUsers,
+} = require("../database/Users");
+const {
+  getToken,
+  validateToken,
+  validateAdmin,
+} = require("../middleware/auth");
 const { login } = require("../database/login");
 
 const userRoutes = express.Router();
+
+userRoutes.get("/", async (req, res) => {
+  console.log(11);
+
+  try {
+    const data = await getAllUsers();
+    if (!data) {
+      console.log("Data is null, returning 404");
+      res.status(404).send("Letter is not found");
+      return;
+    }
+    res.json(data);
+  } catch (err) {
+    console.error("Error in postsRoutes:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 userRoutes.post("/login", async (req, res) => {
   console.log(11);
@@ -19,7 +47,9 @@ userRoutes.post("/login", async (req, res) => {
       res.status(404).send("user is not found");
       return;
     }
-    res.json(data);
+    const token = { email: email, permission: "user" };
+    res.json({ data: data, token: await getToken(token) });
+    // res.json(data);
   } catch (err) {
     console.error("Error in postsRoutes:", err);
     res.status(500).send("Internal Server Error");
@@ -27,9 +57,8 @@ userRoutes.post("/login", async (req, res) => {
 });
 userRoutes.get("/:id", async (req, res) => {
   console.log(11);
-const id = req.params.id;
+  const id = req.params.id;
   try {
-    
     const data = await getUserById(id);
     if (!data) {
       console.log("Data is null, returning 404");
@@ -60,7 +89,7 @@ userRoutes.get("/:userLetter", async (req, res) => {
   }
 });
 
-userRoutes.post("/", async (req, res) => {
+userRoutes.post("/", validateToken, validateAdmin, async (req, res) => {
   console.log(22);
 
   try {
@@ -88,6 +117,28 @@ userRoutes.post("/", async (req, res) => {
     console.log(36);
     console.error("Error in postsRoutes:", err);
     res.status(500).send("Internal Server Error");
+  }
+});
+
+userRoutes.delete("/", validateToken, validateAdmin, async (req, res) => {
+  // userRoutes.delete("/",  async (req, res) => {
+  // userRoutes.delete("/", async (req, res) => {
+  console.log(1111);
+  const id = req.body.id;
+  const email = req.body.email;
+  console.log(id);
+
+  try {
+    const data = await deleteUser(id, email);
+    if (!data) {
+      console.log("Data is null, returning 404");
+      res.status(404).send("Letter is not found");
+      return;
+    }
+    res.json(data);
+  } catch (err) {
+    console.error("Error in postsRoutes:", err);
+    res.status(500).send("Internal 789 Server Error");
   }
 });
 

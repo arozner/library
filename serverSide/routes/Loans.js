@@ -9,6 +9,7 @@ const {
   updateLoanReturn} 
   = require("../database/loans");
 const { login } = require("../database/login");
+const { getToken, validateToken, validateAdmin } =require("../middleware/auth")
 
 const loansRoutes = express.Router();
 
@@ -99,7 +100,7 @@ loansRoutes.post("/", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-loansRoutes.put("/", async (req, res) => {
+loansRoutes.put("/", validateToken, validateAdmin , async (req, res) => {
   console.log(22);
 
   try {

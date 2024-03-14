@@ -2,28 +2,30 @@
 import Home from '../Home'
 
 import { Route, Routes, useNavigate, Link } from 'react-router-dom'
-
-import React, { useEffect, useState } from 'react';
+import DataContext from "../context/DataContext";
+import React, { useContext, useEffect, useState } from 'react';
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import axios from 'axios';
+import Cookies from "js-cookie";
 
 export default function AdminLogin() {
   const nav = useNavigate();
 
-  const [adminName, setAdminName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [checkingNameAndPassword, setCheckingNameAndPassword] = useState(false);
+  const [checkingEmailAndPassword, setCheckingEmailAndPassword] = useState(false);
   const [adminExists, setAdminExists] = useState(false);
+  const {adminToken, setAdminToken} = useContext(DataContext); 
 
   const handleInput = (event) => {
     const { name, value } = event.target;
-    if (name === "adminName") {
-      setAdminName(value);
-      console.log(adminName);
+    if (name === "email") {
+      setEmail(value);
+      console.log(email);
     } else if (name === "password") {
       console.log(password);
       setPassword(value);
@@ -31,12 +33,12 @@ export default function AdminLogin() {
   };
 
   useEffect(() => {
-    if (password.length >= 6 && adminName.length > 0) {
-      setCheckingNameAndPassword(true);
+    if (password.length >= 6 && email.length > 0) {
+      setCheckingEmailAndPassword(true);
     } else {
-      setCheckingNameAndPassword(false);
+      setCheckingEmailAndPassword(false);
     }
-  }, [adminName, password]);
+  }, [email, password]);
 
  
   const checkUserExists = async (event) => {
@@ -47,15 +49,23 @@ export default function AdminLogin() {
 
     try {
       const response = await axios.post('http://localhost:9999/api/admin', {
-        adminName: adminName,
+        email: email,
         password: password,
       });
+      if (response.data.data && response.data.token) {
+        const adminId = response.data.data[0].id;
+        const token = response.data.token;
+        // const adminId = user.id;
+    
+        Cookies.set("admin", (token))
+        setAdminExists(response.data.data[0]);
+        console.log("admin:", Cookies.get("admin"));
+        setAdminToken(Cookies.get("admin"));
 
-      if (Array.isArray(response.data) && response.data.length > 0) {
-        const adminName = response.data[0].username;
-        console.log(adminName);
-        setAdminExists(response.data);
-        nav(`/admin/${adminName}`);
+        // if(Cookies.get("admin"))
+      nav(`/admin/home/${adminId}`);
+    
+     
         console.log(response.data);
         console.log(adminExists);
 
@@ -112,16 +122,16 @@ export default function AdminLogin() {
       noValidate
       sx={{ mt: 1 }}
     >
-      <TextField
-        margin="normal"
-        required
-        fullWidth
-        id="adminName"
-        label="adminName"
-        name="adminName"
-        autoComplete="adminName"
-        autoFocus
-      />
+       <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                />
       <TextField
         margin="normal"
         required
@@ -132,7 +142,7 @@ export default function AdminLogin() {
         id="password"
         autoComplete="current-password"
       />
-      {!checkingNameAndPassword ? (
+      {!checkingEmailAndPassword ? (
         <Button
           type="submit"
           fullWidth
